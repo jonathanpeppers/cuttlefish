@@ -44,6 +44,7 @@ jobs:
           adb start-server
 
       - name: Download Cuttlefish system images
+        id: get-build-id
         run: |
           # Setup working directory
           export CF_HOME=$HOME/cuttlefish
@@ -58,24 +59,42 @@ jobs:
           BUILD_ID=$(curl -sL "https://ci.android.com/builds/branches/${BRANCH}/status.json" | \
             jq -r ".targets[] | select(.name == \"$TARGET\") | .last_known_good_build")
           
+          echo "Build ID: $BUILD_ID"
+          echo "BUILD_ID=$BUILD_ID" >> $GITHUB_OUTPUT
+          echo "BUILD_ID=$BUILD_ID" >> $GITHUB_ENV
+          echo "CF_HOME=$CF_HOME" >> $GITHUB_ENV
+
+      - name: Cache Cuttlefish images
+        id: cache-cuttlefish
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/cuttlefish-downloads
+          key: cuttlefish-${{ steps.get-build-id.outputs.BUILD_ID }}
+
+      - name: Download and extract Cuttlefish images
+        if: steps.cache-cuttlefish.outputs.cache-hit != 'true'
+        run: |
+          DEVICE='aosp_cf_x86_64_only_phone'
+          TARGET="${DEVICE}-userdebug"
+          
           echo "Downloading build $BUILD_ID..."
           SYS_IMG_URL="https://ci.android.com/builds/submitted/${BUILD_ID}/${TARGET}/latest/raw/${DEVICE}-img-${BUILD_ID}.zip"
           HOST_PKG_URL="https://ci.android.com/builds/submitted/${BUILD_ID}/${TARGET}/latest/raw/cvd-host_package.tar.gz"
           
+          mkdir -p ~/cuttlefish-downloads
+          
           echo "Downloading system images..."
-          curl -L "$SYS_IMG_URL" -o aosp_cf_phone-img.zip
+          curl -L "$SYS_IMG_URL" -o ~/cuttlefish-downloads/aosp_cf_phone-img.zip
           
           echo "Downloading host package..."
-          curl -L "$HOST_PKG_URL" -o cvd-host_package.tar.gz
-          
+          curl -L "$HOST_PKG_URL" -o ~/cuttlefish-downloads/cvd-host_package.tar.gz
+
+      - name: Extract Cuttlefish images
+        run: |
           echo "Extracting files..."
-          tar xzf cvd-host_package.tar.gz -C $CF_HOME
-          unzip -q aosp_cf_phone-img.zip -d $CF_HOME
-          
-          # Cleanup downloads
-          rm -f cvd-host_package.tar.gz aosp_cf_phone-img.zip
-          
-          echo "CF_HOME=$CF_HOME" >> $GITHUB_ENV
+          tar xzf ~/cuttlefish-downloads/cvd-host_package.tar.gz -C $CF_HOME
+          unzip -q ~/cuttlefish-downloads/aosp_cf_phone-img.zip -d $CF_HOME
 
       - name: Launch Cuttlefish emulator
         run: |
