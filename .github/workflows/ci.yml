@@ -49,7 +49,10 @@ jobs:
             liblzma-dev libopus-dev libprotobuf-c-dev libprotobuf-dev \
             libsrtp2-dev libssl-dev libxml2-dev libz3-dev \
             pkgconf protobuf-compiler uuid-dev xxd \
-            libfreetype-dev libncurses5
+            libfreetype-dev libtinfo6
+          
+          # Create symlink for libtinfo.so.5 (needed by Bazel's bundled clang)
+          sudo ln -sf /lib/x86_64-linux-gnu/libtinfo.so.6 /lib/x86_64-linux-gnu/libtinfo.so.5
           
           cd external/android-cuttlefish
           
