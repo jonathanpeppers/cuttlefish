@@ -1,0 +1,9 @@
+name: Stop Cuttlefish
+description: Stop the Cuttlefish Android emulator
+
+runs:
+  using: composite
+  steps:
+    - name: Stop emulator
+      shell: bash
+      run: sg kvm -c "sg cvdnetwork -c 'HOME=$HOME/cuttlefish $HOME/cuttlefish/bin/stop_cvd'" || true

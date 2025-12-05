@@ -40,4 +40,4 @@ jobs:
 
       - name: Stop emulator
         if: always()
-        run: sg kvm -c "sg cvdnetwork -c 'HOME=$HOME/cuttlefish $HOME/cuttlefish/bin/stop_cvd'" || true
+        uses: ./.github/actions/stop-cuttlefish
