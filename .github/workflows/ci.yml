@@ -41,16 +41,21 @@ jobs:
           export DEBIAN_FRONTEND=noninteractive
           sudo apt-get update
           
-          # Install build dependencies from debian/control
+          # Install build dependencies from debian/control (excluding bazel and libtinfo5)
           sudo apt-get install -y \
-            bazel cmake config-package-dev debhelper-compat git \
+            cmake config-package-dev debhelper-compat git \
             libaom-dev libclang-dev libcurl4-openssl-dev libfmt-dev \
             libgflags-dev libgoogle-glog-dev libgtest-dev libjsoncpp-dev \
             liblzma-dev libopus-dev libprotobuf-c-dev libprotobuf-dev \
-            libsrtp2-dev libssl-dev libtinfo5 libxml2-dev libz3-dev \
+            libsrtp2-dev libssl-dev libxml2-dev libz3-dev \
             pkgconf protobuf-compiler uuid-dev xxd
           
-          cd external/android-cuttlefish/base
+          cd external/android-cuttlefish
+          
+          # Install bazel using their script
+          sudo tools/buildutils/installbazel.sh
+          
+          cd base
           dpkg-buildpackage -uc -us -b
           
           cd ..
