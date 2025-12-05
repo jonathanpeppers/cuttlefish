@@ -15,6 +15,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Add Android SDK to PATH
+        run: echo "$ANDROID_HOME/platform-tools" >> $GITHUB_PATH
+
       - name: Setup Cuttlefish environment
         run: |
           # Install Cuttlefish base package
