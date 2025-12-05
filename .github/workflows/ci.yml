@@ -19,8 +19,6 @@ jobs:
     
     steps:
       - uses: actions/checkout@v4
-        with:
-          submodules: recursive
 
       - name: Add Android SDK to PATH
         run: echo "$ANDROID_HOME/platform-tools" >> $GITHUB_PATH
