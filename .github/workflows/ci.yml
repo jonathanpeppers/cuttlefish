@@ -7,6 +7,9 @@ on:
     branches: [ main ]
   workflow_dispatch:
 
+env:
+  CUTTLEFISH_VERSION: v1.32.0
+
 jobs:
   boot-cuttlefish:
     runs-on: ubuntu-latest
@@ -22,8 +25,15 @@ jobs:
 
       - name: Download Cuttlefish pre-built packages
         run: |
-          # Download debs_amd64 artifact from v1.32.0 release build
-          gh run download 19181203823 --repo google/android-cuttlefish --name debs_amd64
+          # Get the workflow run ID for the tag release
+          RUN_ID=$(gh run list --repo google/android-cuttlefish --workflow .github/workflows/main.yml \
+            --json databaseId,headBranch,status \
+            --jq ".[] | select(.headBranch == \"${{ env.CUTTLEFISH_VERSION }}\") | select(.status == \"completed\") | .databaseId" \
+            | head -1)
+          
+          echo "Downloading debs_amd64 artifact from run ID: $RUN_ID"
+          gh run download $RUN_ID --repo google/android-cuttlefish --name debs_amd64
+          
           # Extract the tar file from the artifact
           tar -xf debs_amd64.tar
         env:
