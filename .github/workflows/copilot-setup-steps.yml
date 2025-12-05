@@ -1,0 +1,28 @@
+name: "Copilot Setup Steps"
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - .github/workflows/copilot-setup-steps.yml
+  pull_request:
+    paths:
+      - .github/workflows/copilot-setup-steps.yml
+
+jobs:
+  copilot-setup-steps:
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: read
+    
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Cuttlefish
+        uses: ./.github/actions/setup-cuttlefish
+        with:
+          cuttlefish-version: v1.32.0
+          android-branch: aosp-android-latest-release
+          android-device: aosp_cf_x86_64_only_phone
+          memory-mb: 8192
