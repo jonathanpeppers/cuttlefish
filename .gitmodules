@@ -1,0 +1,3 @@
+[submodule "external/android-cuttlefish"]
+	path = external/android-cuttlefish
+	url = https://github.com/google/android-cuttlefish
