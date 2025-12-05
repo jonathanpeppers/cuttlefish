@@ -48,7 +48,8 @@ jobs:
             libgflags-dev libgoogle-glog-dev libgtest-dev libjsoncpp-dev \
             liblzma-dev libopus-dev libprotobuf-c-dev libprotobuf-dev \
             libsrtp2-dev libssl-dev libxml2-dev libz3-dev \
-            pkgconf protobuf-compiler uuid-dev xxd
+            pkgconf protobuf-compiler uuid-dev xxd \
+            libfreetype-dev
           
           cd external/android-cuttlefish
           
