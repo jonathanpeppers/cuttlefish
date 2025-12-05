@@ -9,6 +9,8 @@ on:
 
 env:
   CUTTLEFISH_VERSION: v1.32.0
+  ANDROID_BRANCH: aosp-android-latest-release
+  ANDROID_DEVICE: aosp_cf_x86_64_only_phone
 
 jobs:
   boot-cuttlefish:
@@ -68,9 +70,9 @@ jobs:
           export CF_HOME=$HOME/cuttlefish
           mkdir -p $CF_HOME
           
-          # Download latest stable Cuttlefish images (API 35)
-          BRANCH='aosp-android-latest-release'
-          DEVICE='aosp_cf_x86_64_only_phone'
+          # Download Android system images
+          BRANCH='${{ env.ANDROID_BRANCH }}'
+          DEVICE='${{ env.ANDROID_DEVICE }}'
           TARGET="${DEVICE}-userdebug"
           
           echo "Fetching build ID for $TARGET from branch $BRANCH..."
@@ -93,7 +95,7 @@ jobs:
       - name: Download and extract Cuttlefish images
         if: steps.cache-cuttlefish.outputs.cache-hit != 'true'
         run: |
-          DEVICE='aosp_cf_x86_64_only_phone'
+          DEVICE='${{ env.ANDROID_DEVICE }}'
           TARGET="${DEVICE}-userdebug"
           
           echo "Downloading build $BUILD_ID..."
