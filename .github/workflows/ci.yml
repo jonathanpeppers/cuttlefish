@@ -24,6 +24,8 @@ jobs:
         run: |
           # Download debs_amd64 artifact from v1.32.0 release build
           gh run download 19181203823 --repo google/android-cuttlefish --name debs_amd64
+          # Extract the tar file from the artifact
+          tar -xf debs_amd64.tar
         env:
           GH_TOKEN: ${{ github.token }}
 
