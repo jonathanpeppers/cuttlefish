@@ -1,4 +1,4 @@
-# Android Emulators CI
+# Android Cuttlefish on GitHub Actions
 
 This repository demonstrates how to boot a Cuttlefish Android emulator in GitHub Actions using the preinstalled Android SDK on ubuntu-latest runners.
 
