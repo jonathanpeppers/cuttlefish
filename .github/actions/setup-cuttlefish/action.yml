@@ -6,10 +6,14 @@ inputs:
     description: 'Cuttlefish version tag (e.g., v1.32.0)'
     required: false
     default: 'v1.32.0'
-  android-branch:
-    description: 'Android branch to download (e.g., aosp-android-latest-release)'
+  api-level:
+    description: 'Android API level (e.g., 35, 36, 36.1)'
     required: false
-    default: 'aosp-android-latest-release'
+    default: '36'
+  android-branch:
+    description: 'Android branch to download (e.g., aosp-android-latest-release). If not specified, derived from api-level'
+    required: false
+    default: ''
   android-device:
     description: 'Android device type (e.g., aosp_cf_x86_64_only_phone)'
     required: false
@@ -71,8 +75,20 @@ runs:
       id: build-id
       shell: bash
       run: |
+        # Determine the Android branch based on api-level if android-branch is not provided
+        if [ -z "${{ inputs.android-branch }}" ]; then
+          API_LEVEL="${{ inputs.api-level }}"
+          # Remove any decimal points for branch name (e.g., 36.1 -> 361)
+          API_LEVEL_CLEAN=$(echo "$API_LEVEL" | tr -d '.')
+          BRANCH="aosp-android${API_LEVEL_CLEAN}-release"
+        else
+          BRANCH="${{ inputs.android-branch }}"
+        fi
+        
+        echo "Using Android branch: $BRANCH"
+        
         TARGET="${{ inputs.android-device }}-userdebug"
-        BUILD_ID=$(curl -sL "https://ci.android.com/builds/branches/${{ inputs.android-branch }}/status.json" | \
+        BUILD_ID=$(curl -sL "https://ci.android.com/builds/branches/${BRANCH}/status.json" | \
           jq -r ".targets[] | select(.name == \"$TARGET\") | .last_known_good_build")
         echo "BUILD_ID=$BUILD_ID" >> $GITHUB_OUTPUT
         echo "BUILD_ID=$BUILD_ID" >> $GITHUB_ENV

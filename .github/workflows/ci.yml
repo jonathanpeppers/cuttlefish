@@ -10,6 +10,10 @@ on:
 jobs:
   boot-cuttlefish:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        api-level: [30, 31, 32, 33, 34, 35, 36, '36.1']
     
     steps:
       - uses: actions/checkout@v4
@@ -21,7 +25,7 @@ jobs:
         uses: ./.github/actions/setup-cuttlefish
         with:
           cuttlefish-version: v1.32.0
-          android-branch: aosp-android-latest-release
+          api-level: ${{ matrix.api-level }}
           android-device: aosp_cf_x86_64_only_phone
           memory-mb: 8192
 
@@ -43,7 +47,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: maui-app-screenshot
+          name: maui-app-screenshot-api-${{ matrix.api-level }}
           path: screenshots/maui-app-screenshot.png
           retention-days: 30
 
