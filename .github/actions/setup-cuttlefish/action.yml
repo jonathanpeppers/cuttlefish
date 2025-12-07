@@ -6,14 +6,10 @@ inputs:
     description: 'Cuttlefish version tag (e.g., v1.32.0)'
     required: false
     default: 'v1.32.0'
-  api-level:
-    description: 'Android API level (e.g., 35, 36, 36.1)'
-    required: false
-    default: '36'
   android-branch:
-    description: 'Android branch to download (e.g., aosp-android-latest-release). If not specified, derived from api-level'
+    description: 'Android branch to download (e.g., aosp-android-latest-release, aosp-android14-gsi, aosp-android15-gsi)'
     required: false
-    default: ''
+    default: 'aosp-android-latest-release'
   android-device:
     description: 'Android device type (e.g., aosp_cf_x86_64_only_phone)'
     required: false
@@ -75,16 +71,7 @@ runs:
       id: build-id
       shell: bash
       run: |
-        # Determine the Android branch based on api-level if android-branch is not provided
-        if [ -z "${{ inputs.android-branch }}" ]; then
-          API_LEVEL="${{ inputs.api-level }}"
-          # Remove any decimal points for branch name (e.g., 36.1 -> 361)
-          API_LEVEL_CLEAN=$(echo "$API_LEVEL" | tr -d '.')
-          BRANCH="aosp-android${API_LEVEL_CLEAN}-release"
-        else
-          BRANCH="${{ inputs.android-branch }}"
-        fi
-        
+        BRANCH="${{ inputs.android-branch }}"
         echo "Using Android branch: $BRANCH"
         
         TARGET="${{ inputs.android-device }}-userdebug"
