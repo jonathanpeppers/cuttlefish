@@ -7,7 +7,7 @@ inputs:
     required: false
     default: 'v1.32.0'
   android-branch:
-    description: 'Android branch to download (e.g., aosp-android-latest-release)'
+    description: 'Android branch to download (e.g., aosp-android-latest-release, aosp-android14-gsi)'
     required: false
     default: 'aosp-android-latest-release'
   android-device:
@@ -17,11 +17,15 @@ inputs:
   memory-mb:
     description: 'Memory allocation for the emulator in MB'
     required: false
-    default: '8192'
+    default: '4096'
   cpus:
     description: 'Number of CPUs to allocate (default: all available)'
     required: false
     default: '0'
+  gpu-mode:
+    description: 'GPU mode (auto, drm_virgl, gfxstream, guest_swiftshader)'
+    required: false
+    default: 'guest_swiftshader'
 
 outputs:
   build-id:
@@ -71,11 +75,15 @@ runs:
       id: build-id
       shell: bash
       run: |
+        BRANCH="${{ inputs.android-branch }}"
+        echo "Using Android branch: $BRANCH"
+        
         TARGET="${{ inputs.android-device }}-userdebug"
-        BUILD_ID=$(curl -sL "https://ci.android.com/builds/branches/${{ inputs.android-branch }}/status.json" | \
+        BUILD_ID=$(curl -sL "https://ci.android.com/builds/branches/${BRANCH}/status.json" | \
           jq -r ".targets[] | select(.name == \"$TARGET\") | .last_known_good_build")
         echo "BUILD_ID=$BUILD_ID" >> $GITHUB_OUTPUT
         echo "BUILD_ID=$BUILD_ID" >> $GITHUB_ENV
+        echo "BRANCH=$BRANCH" >> $GITHUB_OUTPUT
         echo "CF_HOME=$HOME/cuttlefish" >> $GITHUB_ENV
 
     - name: Cache Android images
@@ -83,7 +91,7 @@ runs:
       uses: actions/cache@v4
       with:
         path: ~/cuttlefish-downloads
-        key: android-images-${{ steps.build-id.outputs.BUILD_ID }}
+        key: android-images-${{ steps.build-id.outputs.BRANCH }}-${{ steps.build-id.outputs.BUILD_ID }}
 
     - name: Download Android images
       if: steps.cache-images.outputs.cache-hit != 'true'
@@ -112,7 +120,9 @@ runs:
         fi
         
         sg kvm -c "sg cvdnetwork -c 'HOME=$HOME/cuttlefish $HOME/cuttlefish/bin/launch_cvd \
-          -daemon -enable_sandbox=false -memory_mb=${{ inputs.memory-mb }} -cpus=$CPUS -report_anonymous_usage_stats=n'"
+          -daemon -memory_mb=${{ inputs.memory-mb }} -cpus=$CPUS \
+          -gpu_mode=${{ inputs.gpu-mode }} \
+          -enable_sandbox=false -report_anonymous_usage_stats=n'"
         
         adb wait-for-device
         

@@ -10,6 +10,12 @@ on:
 jobs:
   boot-cuttlefish:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        android-branch:
+          - aosp-android14-gsi           # API 34
+          - aosp-android-latest-release  # API 36-36.1
     
     steps:
       - uses: actions/checkout@v4
@@ -21,9 +27,9 @@ jobs:
         uses: ./.github/actions/setup-cuttlefish
         with:
           cuttlefish-version: v1.32.0
-          android-branch: aosp-android-latest-release
+          android-branch: ${{ matrix.android-branch }}
           android-device: aosp_cf_x86_64_only_phone
-          memory-mb: 8192
+          memory-mb: 4096
 
       - name: Build and run app
         uses: ./.github/actions/build-app
@@ -43,7 +49,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: maui-app-screenshot
+          name: maui-app-screenshot-${{ matrix.android-branch }}
           path: screenshots/maui-app-screenshot.png
           retention-days: 30
 
