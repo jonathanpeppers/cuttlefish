@@ -7,7 +7,7 @@ inputs:
     required: false
     default: 'v1.32.0'
   android-branch:
-    description: 'Android branch to download (e.g., aosp-android-latest-release, aosp-android14-gsi, aosp-android15-gsi)'
+    description: 'Android branch to download (e.g., aosp-android-latest-release, aosp-android14-gsi)'
     required: false
     default: 'aosp-android-latest-release'
   android-device:
