@@ -22,6 +22,10 @@ inputs:
     description: 'Number of CPUs to allocate (default: all available)'
     required: false
     default: '0'
+  gpu-mode:
+    description: 'GPU mode (auto, drm_virgl, gfxstream, guest_swiftshader)'
+    required: false
+    default: 'guest_swiftshader'
 
 outputs:
   build-id:
@@ -116,7 +120,8 @@ runs:
         fi
         
         sg kvm -c "sg cvdnetwork -c 'HOME=$HOME/cuttlefish $HOME/cuttlefish/bin/launch_cvd \
-          -daemon -enable_sandbox=false -memory_mb=${{ inputs.memory-mb }} -cpus=$CPUS -report_anonymous_usage_stats=n'"
+          -daemon -enable_sandbox=false -memory_mb=${{ inputs.memory-mb }} -cpus=$CPUS \
+          -gpu_mode=${{ inputs.gpu-mode }} -report_anonymous_usage_stats=n'"
         
         adb wait-for-device
         
