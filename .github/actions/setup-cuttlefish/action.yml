@@ -119,9 +119,17 @@ runs:
           CPUS=$(nproc)
         fi
         
+        # Older Android versions don't support all flags
+        BRANCH="${{ inputs.android-branch }}"
+        if [[ "$BRANCH" == "aosp-android14-gsi" || "$BRANCH" == "aosp-android-latest-release" ]]; then
+          EXTRA_FLAGS="-enable_sandbox=false -report_anonymous_usage_stats=n"
+        else
+          EXTRA_FLAGS=""
+        fi
+        
         sg kvm -c "sg cvdnetwork -c 'HOME=$HOME/cuttlefish $HOME/cuttlefish/bin/launch_cvd \
-          -daemon -enable_sandbox=false -memory_mb=${{ inputs.memory-mb }} -cpus=$CPUS \
-          -gpu_mode=${{ inputs.gpu-mode }} -report_anonymous_usage_stats=n'"
+          -daemon -memory_mb=${{ inputs.memory-mb }} -cpus=$CPUS \
+          -gpu_mode=${{ inputs.gpu-mode }} $EXTRA_FLAGS'"
         
         adb wait-for-device
         
