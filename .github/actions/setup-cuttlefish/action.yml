@@ -17,7 +17,7 @@ inputs:
   memory-mb:
     description: 'Memory allocation for the emulator in MB'
     required: false
-    default: '8192'
+    default: '4096'
   cpus:
     description: 'Number of CPUs to allocate (default: all available)'
     required: false

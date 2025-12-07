@@ -32,7 +32,7 @@ jobs:
           cuttlefish-version: v1.32.0
           android-branch: ${{ matrix.android-branch }}
           android-device: aosp_cf_x86_64_only_phone
-          memory-mb: 8192
+          memory-mb: 4096
 
       - name: Build and run app
         uses: ./.github/actions/build-app
